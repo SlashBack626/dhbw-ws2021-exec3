@@ -15,6 +15,11 @@ app.use(cors());
 // required to handle the request body
 app.use(express.json());
 
+// add mqtt support
+var mqtt = require("mqtt");
+//var client  = mqtt.connect('mqtt://test.mosquitto.org');
+var client = mqtt.connect("mqtt://mqtt:1883");
+
 const axios = require("axios");
 app.get("/posts", (req, res) => {
   // 001hs - when a get request is received send all data / post back to client
@@ -46,6 +51,7 @@ app.post("/posts", async (req, res) => {
 
   // 001 return status 201 to client and the data itself
   res.status(201).send(posts[id]);
+  client.publish("postapp/PostCreated", JSON.stringify(posts[id]));
 });
 
 // hs002 new for event bus implementation

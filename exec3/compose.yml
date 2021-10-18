@@ -1,11 +1,22 @@
 version: "3.8"
 
 services:
+  mqtt:
+    container_name: mqtt
+    image: hivemq/hivemq4
+    healthcheck:
+      test: ["CMD", "curl", "mqtt://localhost:1883"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   posts:
     container_name: posts
     depends_on:
       - eventbus
+      - mqtt
     image: dhbw/posts
+    build:
+      context: ./posts
     ports:
       - "4000:4000"
   comments:
@@ -13,13 +24,18 @@ services:
     depends_on:
       - eventbus
     image: dhbw/comments
+    build:
+      context: ./comments
     ports:
       - "4001:4001"
   query:
     container_name: query
     depends_on:
       - eventbus
+      - mqtt
     image: dhbw/query
+    build:
+      context: ./query
     ports:
       - "4002:4002"
   moderation:
@@ -27,11 +43,15 @@ services:
     depends_on:
       - eventbus
     image: dhbw/moderation
+    build:
+      context: ./moderation
     ports:
       - "4003:4003"
   eventbus:
     container_name: eventbus
     image: dhbw/eventbus
+    build:
+      context: ./eventbus
     ports:
       - "4005:4005"
   client:
@@ -39,6 +59,8 @@ services:
       - "5000:5000"
     container_name: client
     image: dhbw/client
+    build:
+      context: ./client
     depends_on:
       - eventbus
       - query
