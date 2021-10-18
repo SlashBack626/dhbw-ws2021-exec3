@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  posts:
+    container_name: posts
+    depends_on:
+      - eventbus
+    image: dhbw/posts
+    ports:
+      - "4000:4000"
+  comments:
+    container_name: comments
+    depends_on:
+      - eventbus
+    image: dhbw/comments
+    ports:
+      - "4001:4001"
+  query:
+    container_name: query
+    depends_on:
+      - eventbus
+    image: dhbw/query
+    ports:
+      - "4002:4002"
+  moderation:
+    container_name: moderation
+    depends_on:
+      - eventbus
+    image: dhbw/moderation
+    ports:
+      - "4003:4003"
+  eventbus:
+    container_name: eventbus
+    image: dhbw/eventbus
+    ports:
+      - "4005:4005"
+  client:
+    ports:
+      - "5000:5000"
+    container_name: client
+    image: dhbw/client
+    depends_on:
+      - eventbus
+      - query
+      - posts
+      - moderation
+      - comments
